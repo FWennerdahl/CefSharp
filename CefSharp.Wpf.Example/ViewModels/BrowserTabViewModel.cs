@@ -28,6 +28,14 @@ namespace CefSharp.Wpf.Example.ViewModels
             set { Set(ref addressEditable, value); }
         }
 
+		private Visibility visibility = Visibility.Collapsed;
+		public Visibility Visibility
+		{
+			get { return visibility; }
+			set { Set(ref visibility, value); }
+		}
+			
+
         private string outputMessage;
         public string OutputMessage
         {
@@ -53,7 +61,12 @@ namespace CefSharp.Wpf.Example.ViewModels
         public IWpfWebBrowser WebBrowser
         {
             get { return webBrowser; }
-            set { Set(ref webBrowser, value); }
+            set {
+				Set(ref webBrowser, value);
+
+				if (webBrowser != null)
+					webBrowser.LoadingStateChanged += webBrowser_LoadingStateChanged;
+			}
         }
 
         private object evaluateJavaScriptResult;
@@ -94,6 +107,11 @@ namespace CefSharp.Wpf.Example.ViewModels
             var version = string.Format("Chromium: {0}, CEF: {1}, CefSharp: {2}", Cef.ChromiumVersion, Cef.CefVersion, Cef.CefSharpVersion);
             OutputMessage = version;
         }
+
+		void webBrowser_LoadingStateChanged(object sender, LoadingStateChangedEventArgs e)
+		{
+			Visibility = e.IsLoading ? Visibility.Collapsed : Visibility.Visible;
+		}
 
         private async void EvaluateJavaScript(string s)
         {
